@@ -1,6 +1,7 @@
 import json
-from googleapiclient.discovery import build
 import os
+
+from googleapiclient.discovery import build
 
 
 class Channel:
@@ -8,8 +9,7 @@ class Channel:
     # YT_API_KEY скопирован из гугла и вставлен в переменные окружения
     api_key: str = os.environ.get('YT_API_KEY')
     # создать специальный объект для работы с API
-    youtube = build('youtube', 'v3', developerKey = api_key)
-
+    youtube = build('youtube', 'v3', developerKey=api_key)
 
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала.
@@ -31,18 +31,42 @@ class Channel:
         self.video_count = channel['items'][0]['statistics']['videoCount']
         self.view_count = channel['items'][0]['statistics']['viewCount']
 
+    def __str__(self):
+        return f'{self.title} ({self.url})'
+
+
+    def __add__(self, other) -> int:
+        return int(self.subscriber_count) + int(other.subscriber_count)
+
+
+    def __sub__ (self, other)-> int:
+        return int(self.subscriber_count) - int(other.subscriber_count)
+
+
+    def __gt__(self, other) -> bool:
+        return int(self.subscriber_count) > int(other.subscriber_count)
+
+
+    def __ge__(self, other) -> bool:
+        return int(self.subscriber_count) >= int(other.subscriber_count)
+
+
+    def __lt__(self, other) -> bool:
+        return int(self.subscriber_count) < int(other.subscriber_count)
+
+
+    def __le__(self, other) -> bool:
+        return int(self.subscriber_count) <= int(other.subscriber_count)
 
     @property
-
     def channel_id(self):
         return self.__channel_id
 
     def print_info(self) -> None:
         """Выводит в консоль информацию о канале."""
-        channel = self.youtube.channels().list\
-        (id = self.channel_id, part = 'snippet,statistics').execute()
+        channel = self.youtube.channels().list \
+            (id=self.channel_id, part='snippet,statistics').execute()
         print(channel)
-
 
     def to_json(self, name: str) -> None:
         """
@@ -51,7 +75,6 @@ class Channel:
         a = self.__dict__
         with open(name, 'w', encoding='utf-8') as f:
             json.dump(a, f)
-
 
     @classmethod
     def get_service(cls):
