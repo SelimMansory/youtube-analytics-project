@@ -2,14 +2,10 @@ import os
 from googleapiclient.discovery import build
 import isodate
 from datetime import timedelta
+from src.channel import MixinYoutube
 
 
-class PlayList:
-
-    api_key: str = os.environ.get('YT_API_KEY')
-    # создать специальный объект для работы с API
-    youtube = build('youtube', 'v3', developerKey = api_key)
-
+class PlayList(MixinYoutube):
 
     def __init__(self, id_playlist):
         self.id_playlist = id_playlist

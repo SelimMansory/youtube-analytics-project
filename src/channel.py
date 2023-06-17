@@ -1,15 +1,26 @@
-import os
 import json
+import os
 
 from googleapiclient.discovery import build
 
 
-class Channel:
-    """Класс для ютуб - канала"""
+class MixinYoutube:
     # YT_API_KEY скопирован из гугла и вставлен в переменные окружения
     api_key: str = os.environ.get('YT_API_KEY')
     # создать специальный объект для работы с API
     youtube = build('youtube', 'v3', developerKey=api_key)
+
+    def info_channel(self, channel):
+        return self.youtube.channels().list(id=channel, part='snippet,statistics').execute()
+
+    def info_video(self, id_video):
+        return self.youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
+                                          id=id_video
+                                          ).execute()
+
+
+class Channel(MixinYoutube):
+    """Класс для ютуб - канала"""
 
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала.
@@ -34,26 +45,20 @@ class Channel:
     def __str__(self):
         return f'{self.title} ({self.url})'
 
-
     def __add__(self, other) -> int:
         return int(self.subscriber_count) + int(other.subscriber_count)
 
-
-    def __sub__ (self, other)-> int:
+    def __sub__(self, other) -> int:
         return int(self.subscriber_count) - int(other.subscriber_count)
-
 
     def __gt__(self, other) -> bool:
         return int(self.subscriber_count) > int(other.subscriber_count)
 
-
     def __ge__(self, other) -> bool:
         return int(self.subscriber_count) >= int(other.subscriber_count)
 
-
     def __lt__(self, other) -> bool:
         return int(self.subscriber_count) < int(other.subscriber_count)
-
 
     def __le__(self, other) -> bool:
         return int(self.subscriber_count) <= int(other.subscriber_count)
@@ -79,6 +84,7 @@ class Channel:
     @classmethod
     def get_service(cls):
         return cls.youtube
+
 
 client = Channel("UCwHL6WHUarjGfUM_586me8w")
 client.print_info()
