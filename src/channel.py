@@ -69,7 +69,7 @@ class Channel(MixinYoutube):
 
     def print_info(self) -> None:
         """Выводит в консоль информацию о канале."""
-        channel = self.youtube.channels().list \
+        channel = self.youtube.channels().list\
             (id=self.channel_id, part='snippet,statistics').execute()
         print(channel)
 
